@@ -1,0 +1,10 @@
+[Unit]
+Description=GPS logger app
+
+[Service]
+WorkingDirectory=/home/pi/pi-car-logger/
+ExecStart=/home/pi/pi-car-logger/venv/bin/python gps_logger/logger.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
