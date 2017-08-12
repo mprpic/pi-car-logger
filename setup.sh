@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 declare -a deps=("python-gps" "python-virtualenv")
 declare -a missing_deps=()

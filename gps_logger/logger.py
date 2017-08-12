@@ -1,5 +1,6 @@
 import os
 import gps
+import signal
 from pprint import pprint
 from peewee import Model, SqliteDatabase, FloatField, DateTimeField
 from playhouse.shortcuts import model_to_dict
@@ -45,7 +46,7 @@ def init_gps():
     return session
 
 
-def quit():
+def quit_logger(*args):
     print('Exiting GPS logger...')
     db.close()
     exit(0)
@@ -83,12 +84,13 @@ def record_data(session):
         except KeyError:
             pass
         except (KeyboardInterrupt, StopIteration):
-            quit()
+            quit_logger()
 
 
 def main():
     init_db()
     session = init_gps()
+    signal.signal(signal.SIGTERM, quit_logger)
 
     record_data(session)
 
