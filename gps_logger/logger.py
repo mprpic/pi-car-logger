@@ -71,7 +71,8 @@ def init_gps():
 def quit_logger(*args):
     print('Exiting GPS logger...')
 
-    if not DEBUG_MODE:
+    # Closes the connection to an initialized database (if one is open)
+    if db.database:
         db.close()
 
     exit(0)
@@ -113,17 +114,18 @@ def record_data(session):
 
 
 def main():
+    # Register kill and int signal handling
+    signal.signal(signal.SIGTERM, quit_logger)
+    signal.signal(signal.SIGINT, quit_logger)
+
+    # Initialize GPS stream
+    session = init_gps()
+
     # In debug mode, we don't save to DB so no need to initialize it.
     if DEBUG_MODE:
         print('DEBUG mode enabled; printing data...')
     else:
         init_db()
-
-    # Registed kill and int signal handling
-    signal.signal(signal.SIGTERM, quit_logger)
-    signal.signal(signal.SIGINT, quit_logger)
-
-    session = init_gps()
 
     record_data(session)
 
