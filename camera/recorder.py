@@ -35,6 +35,7 @@ def quit_recorder(*args):
 
 
 def record(camera):
+    print('Started recording...')
     for i in camera.record_sequence(generate_filenames()):
         camera.wait_recording(RECORDING_LENGTH)
 

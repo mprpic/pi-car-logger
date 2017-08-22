@@ -5,7 +5,7 @@ Description=Video recording app
 User=pi
 Group=pi
 WorkingDirectory=/home/pi/pi-car-logger/
-ExecStart=/home/pi/pi-car-logger/venv/bin/python cam/recorder.py
+ExecStart=/home/pi/pi-car-logger/venv/bin/python camera/recorder.py
 Restart=on-failure
 
 [Install]
