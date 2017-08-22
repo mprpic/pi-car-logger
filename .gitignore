@@ -1,2 +1,4 @@
 venv
-gps_logger/gps_data.sqlite
+*.sqlite
+*.h264
+*.pyc

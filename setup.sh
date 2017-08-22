@@ -10,6 +10,10 @@ for app in "${deps[@]}"; do
     fi
 done
 
+if ! grep -q "start_x=1" /boot/config.txt; then
+    echo 'WARNING: Camera module not enabled; run raspi-config to enable it'
+fi
+
 if [ -z "$missing_deps" ]; then
     # Set up a virtual environment (including system packages since
     # python-gps is not available in PyPI)

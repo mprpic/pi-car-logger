@@ -26,7 +26,7 @@ class GPSRecord(Model):
     longitude = FloatField(null=True)     # Longitude in degrees: +/- signifies East/West
     altitude = FloatField(null=True)      # In meters
     climb_speed = FloatField(null=True)   # Climb (positive) or sink (negative) rate in m/s
-    speed = FloatField(null=True)         # Speed over ground in m/s
+    speed = FloatField(null=True)         # Speed over ground in km/h
     timestamp = DateTimeField(null=True)  # In UTC
 
     class Meta:
@@ -94,7 +94,7 @@ def record_data(session):
                 longitude=report['lon'],
                 altitude=report['alt'],
                 climb_speed=report['climb'],
-                speed=report['speed'],
+                speed=report['speed'] * 3.6,  # Convert from m/s to km/h
                 timestamp=report['time'],
             )
 
