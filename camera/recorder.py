@@ -12,14 +12,14 @@ FILE_SUFFIX = '.h264'
 
 
 def generate_filenames():
-    existing_files = glob.glob('*.h264')
     working_dir = os.path.dirname(os.path.realpath(__file__))
+    existing_files = glob.glob(working_dir + '/*' + FILE_SUFFIX)
 
     if not existing_files:
         count_from = 1
     else:
         newest_file = max(existing_files, key=os.path.getctime)
-        count_from = int(newest_file.rstrip(FILE_SUFFIX).lstrip('0'))
+        count_from = int(os.path.basename(newest_file).replace(FILE_SUFFIX, '').lstrip('0'))
 
         if count_from >= MAX_NUM_FILES:
             count_from = 1
