@@ -1,3 +1,4 @@
+import io
 import os
 import glob
 import signal
@@ -5,7 +6,10 @@ from itertools import cycle, dropwhile
 from picamera import PiCamera
 
 STOP_RECORDING = False
+
 CAMERA_RES = '720p'
+CAMERA_FRAMERATE = 30
+
 RECORDING_LENGTH = 10  # Length of individual videos
 MAX_NUM_FILES = 2000   # Altogether around 5.55 hours of video at max
 FILE_SUFFIX = '.h264'
@@ -42,10 +46,28 @@ def quit_recorder(*args):
     STOP_RECORDING = True
 
 
+class FlushedFileOutput(object):
+    def __init__(self, filename):
+        self.out_file = io.open(filename, 'wb')
+
+    def write(self, buf):
+        self.out_file.write(buf)
+
+    def flush(self):
+        self.out_file.flush()
+        os.fsync(self.out_file.fileno())
+
+    def close(self):
+        self.out_file.close()
+
+
 def record(camera):
     print('Starting recording...')
-    for _ in camera.record_sequence(generate_filenames()):
+
+    for filename in generate_filenames():
+        camera.start_recording(FlushedFileOutput(filename), format='h264')
         camera.wait_recording(RECORDING_LENGTH)
+        camera.stop_recording()
 
 
 def main():
@@ -53,8 +75,10 @@ def main():
     signal.signal(signal.SIGTERM, quit_recorder)
     signal.signal(signal.SIGINT, quit_recorder)
 
-    camera = PiCamera(resolution=CAMERA_RES)
-    record(camera)
+    with PiCamera() as camera:
+        camera.resolution = CAMERA_RES
+        camera.framerate = CAMERA_FRAMERATE
+        record(camera)
 
     print('Stopped recording, exiting...')
 
