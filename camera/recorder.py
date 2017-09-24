@@ -2,6 +2,7 @@ import io
 import os
 import glob
 import signal
+import threading
 from itertools import cycle, dropwhile
 from picamera import PiCamera
 
@@ -46,6 +47,12 @@ def quit_recorder(*args):
     STOP_RECORDING = True
 
 
+def sync_file(out_file):
+    out_file.flush()
+    os.fsync(out_file.fileno())
+    out_file.close()
+
+
 class FlushedFileOutput(object):
     def __init__(self, filename):
         self.out_file = io.open(filename, 'wb')
@@ -53,12 +60,11 @@ class FlushedFileOutput(object):
     def write(self, buf):
         self.out_file.write(buf)
 
-    def flush(self):
-        self.out_file.flush()
-        os.fsync(self.out_file.fileno())
-
+    # Close and flush file to disk in a thread so that we don't delay the
+    # start of recording of the next file.
     def close(self):
-        self.out_file.close()
+        thread = threading.Thread(target=sync_file, args=[self.out_file])
+        thread.start()
 
 
 def record(camera):
